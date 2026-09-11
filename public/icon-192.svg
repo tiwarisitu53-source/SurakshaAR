@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <rect width="192" height="192" rx="40" fill="#0F172A" />
+  <rect x="8" y="8" width="176" height="176" rx="32" fill="none" stroke="#334155" stroke-width="4" />
+  
+  <!-- Hard Hat Helmet Vector -->
+  <path d="M48 116 C48 76 70 52 96 52 C122 52 144 76 144 116 Z" fill="#F97316" />
+  <path d="M40 116 L152 116 C156 116 160 120 158 124 L154 130 C152 134 148 136 144 136 L48 136 C44 136 40 134 38 130 L34 124 C32 120 36 116 40 116 Z" fill="#EA580C" />
+  
+  <!-- Safety Lamp / AR Eye Target on Helmet -->
+  <circle cx="96" cy="80" r="14" fill="#FFFFFF" />
+  <circle cx="96" cy="80" r="9" fill="#0EA5E9" />
+  <circle cx="96" cy="80" r="4" fill="#FFFFFF" />
+  
+  <!-- AR Corner Target Brackets -->
+  <path d="M30 50 L30 30 L50 30" fill="none" stroke="#F97316" stroke-width="6" stroke-linecap="round" />
+  <path d="M162 50 L162 30 L142 30" fill="none" stroke="#F97316" stroke-width="6" stroke-linecap="round" />
+  <path d="M30 142 L30 162 L50 162" fill="none" stroke="#F97316" stroke-width="6" stroke-linecap="round" />
+  <path d="M162 142 L162 162 L142 162" fill="none" stroke="#F97316" stroke-width="6" stroke-linecap="round" />
+</svg>

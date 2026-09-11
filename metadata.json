@@ -1,0 +1,10 @@
+{
+  "name": "Remix SurakshaAR - Industrial Safety Training \u0026 Compliance",
+  "description": "Mobile \u0026 offline-first AR industrial safety training PWA with live camera simulation, Hindi/Santali audio coaching, worker certificate wallet, and zero-network deep mine support.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
