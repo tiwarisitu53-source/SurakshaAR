@@ -3,15 +3,20 @@ import {
   Flame, Wind, ShieldCheck, ShieldAlert, Award, QrCode, 
   Volume2, VolumeX, Sparkles, User, RefreshCw, Wifi, WifiOff, 
   Layers, HardHat, CheckCircle2, ChevronRight, Play, Bot,
-  ExternalLink, BarChart3, BookOpen, AlertTriangle, Smartphone, Download, HardDrive
+  ExternalLink, BarChart3, BookOpen, AlertTriangle, Smartphone, Download, HardDrive,
+  Lock, FileQuestion
 } from 'lucide-react';
-import { SafetyModule, Language, WorkerProfile, CertificateRecord } from './types';
+import { SafetyModule, Language, WorkerProfile, CertificateRecord, ModuleFlowStage } from './types';
 import { safetyModules } from './data/modulesData';
 import { translations } from './data/translations';
 import { mockWorkers } from './data/mockCertificates';
 import { audioAssistant } from './utils/audioAssistant';
 import { offlineStorage } from './utils/offlineStorage';
 import { haptics } from './utils/haptics';
+import { PASS_THRESHOLD } from './utils/constants';
+
+// Gated Flow Module Component
+import { ModuleGatedFlow } from './components/ModuleFlow/ModuleGatedFlow';
 
 // AR Components
 import { ARCameraFeed } from './components/ARView/ARCameraFeed';
@@ -66,6 +71,7 @@ export default function App() {
   const [selectedCertForModal, setSelectedCertForModal] = useState<CertificateRecord | null>(null);
   const [aiCoachOpen, setAICoachOpen] = useState<boolean>(false);
   const [qrScannerOpen, setQrScannerOpen] = useState<boolean>(false);
+  const [qrInitialCertId, setQrInitialCertId] = useState<string>('');
   const [offlineCenterOpen, setOfflineCenterOpen] = useState<boolean>(false);
   const [installModalOpen, setInstallModalOpen] = useState<boolean>(false);
   const [registerModalOpen, setRegisterModalOpen] = useState<boolean>(false);
@@ -93,6 +99,23 @@ export default function App() {
     return unsubscribe;
   }, []);
 
+  // Sync URL hash with module and stage routing
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash;
+      const match = hash.match(/module=([a-z_]+)/);
+      if (match && match[1]) {
+        const found = safetyModules.find(m => m.id === match[1]);
+        if (found) {
+          setActiveModule(found);
+        }
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
   // Voice greeting when language changes or module starts
   const handleLanguageChange = (newLang: Language) => {
     haptics.trigger('tap');
@@ -105,22 +128,21 @@ export default function App() {
     audioAssistant.speak(greeting, newLang);
   };
 
-  // Launch AR Simulation
-  const handleStartModule = (mod: SafetyModule) => {
+  // Launch Safety Module Gated Flow (Training -> Test -> Results -> Certificate)
+  const handleStartModule = (mod: SafetyModule, targetStage?: ModuleFlowStage) => {
     haptics.trigger('step');
-    setActiveModule(mod);
-    setCurrentStepIndex(0);
-    setStepCompleted(false);
-    setIsPlaneLocked(false);
-    setSafetyPoints(0);
-    setHudFeedback(null);
-
-    // Initial audio instruction
-    const initialStep = mod.steps[0];
-    if (initialStep) {
-      const prompt = initialStep.audioPrompt[language] || initialStep.instruction[language];
-      audioAssistant.speak(prompt, language);
+    const progress = offlineStorage.getModuleProgress(currentWorker.id, mod.id, mod.steps.length);
+    
+    // If revisiting a module already passed, direct to Certificate stage (rather than forcing training again)
+    let stageToSet: ModuleFlowStage = targetStage || (progress.passed && progress.bestScore >= PASS_THRESHOLD ? 'certificate' : 'training');
+    
+    // Route guard: Prevent accessing test if training is not completed
+    if (stageToSet === 'test' && !progress.trainingCompleted) {
+      stageToSet = 'training';
     }
+
+    setActiveModule(mod);
+    window.location.hash = `module=${mod.id}&stage=${stageToSet}`;
   };
 
   // Feedback & Scoring in AR Scenario
@@ -211,9 +233,9 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9] text-slate-800 flex flex-col font-sans selection:bg-orange-500 selection:text-white">
+    <div className={`w-full text-slate-800 flex flex-col font-sans selection:bg-orange-500 selection:text-white ${activeModule ? 'h-screen h-[100dvh] overflow-hidden bg-slate-950' : 'min-h-screen bg-[#F1F5F9]'}`}>
       {/* MOBILE-FIRST TOP BAR (Visible on mobile/tablets) */}
-      <div className="md:hidden">
+      <div className="md:hidden shrink-0">
         <MobileTopBar
           language={language}
           onLanguageChange={handleLanguageChange}
@@ -224,7 +246,7 @@ export default function App() {
       </div>
 
       {/* DESKTOP HEADER & TOP NAVIGATION BAR (Visible on md and above) */}
-      <header className="hidden md:block sticky top-0 z-40 bg-[#0F172A] text-white border-b border-slate-700 px-4 sm:px-8 py-3 shadow-sm">
+      <header className={`hidden md:block sticky top-0 z-40 bg-[#0F172A] text-white border-b border-slate-700 px-4 sm:px-8 shadow-sm shrink-0 ${activeModule ? 'py-1.5' : 'py-3'}`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
           {/* Logo & Platform Brand */}
           <div className="flex items-center gap-3">
@@ -448,91 +470,27 @@ export default function App() {
       )}
 
       {/* 2. Main Body Container with Mobile Padding */}
-      <main className="flex-1 flex flex-col pb-20 md:pb-8">
-        {/* ACTIVE AR SIMULATION VIEW */}
+      <main className={`flex-1 flex flex-col min-h-0 w-full ${activeModule ? 'p-0 overflow-hidden' : 'pb-20 md:pb-8'}`}>
+        {/* ACTIVE MODULE GATED FLOW: Training -> Test -> Results -> Certificate */}
         {activeModule ? (
-          <div className="relative flex-1 w-full h-full min-h-[calc(100vh-64px)] bg-black overflow-hidden flex flex-col">
-            <ARCameraFeed
-              language={language}
-              isPlaneLocked={isPlaneLocked}
-              onPlaneLockChange={setIsPlaneLocked}
-              scenarioType={
-                activeModule.id === 'fire_explosion'
-                  ? 'fire'
-                  : activeModule.id === 'gas_confined_space'
-                  ? 'gas'
-                  : activeModule.id === 'machinery_safety'
-                  ? 'machinery'
-                  : activeModule.id === 'ppe_hazard'
-                  ? 'height'
-                  : 'electrical'
-              }
-            >
-              {/* Dynamic AR Scenario Rendering */}
-              {activeModule.id === 'fire_explosion' && (
-                <FireSafetyScenario
-                  stepIndex={currentStepIndex}
-                  language={language}
-                  onStepComplete={handleARStepComplete}
-                  isPlaneLocked={isPlaneLocked}
-                  onAwardPoints={handleAwardPoints}
-                  onIncorrectAction={handleIncorrectAction}
-                />
-              )}
-              {activeModule.id === 'gas_confined_space' && (
-                <GasLeakScenario
-                  stepIndex={currentStepIndex}
-                  language={language}
-                  onStepComplete={handleARStepComplete}
-                  isPlaneLocked={isPlaneLocked}
-                  onAwardPoints={handleAwardPoints}
-                  onIncorrectAction={handleIncorrectAction}
-                />
-              )}
-              {activeModule.id === 'machinery_safety' && (
-                <MachinerySafetyScenario
-                  stepIndex={currentStepIndex}
-                  language={language}
-                  onStepComplete={handleARStepComplete}
-                  isPlaneLocked={isPlaneLocked}
-                />
-              )}
-              {activeModule.id === 'ppe_hazard' && (
-                <HeightSafetyScenario
-                  stepIndex={currentStepIndex}
-                  language={language}
-                  onStepComplete={handleARStepComplete}
-                  isPlaneLocked={isPlaneLocked}
-                />
-              )}
-              {activeModule.id === 'first_aid' && (
-                <ElectricalArcScenario
-                  stepIndex={currentStepIndex}
-                  language={language}
-                  onStepComplete={handleARStepComplete}
-                  isPlaneLocked={isPlaneLocked}
-                />
-              )}
-            </ARCameraFeed>
-
-            {/* AR Top & Bottom HUD Controls */}
-            <ARHUD
-              currentStep={activeModule.steps[currentStepIndex]}
-              totalSteps={activeModule.steps.length}
-              currentStepIndex={currentStepIndex}
-              language={language}
-              onExit={() => setActiveModule(null)}
-              onNextStep={handleProceedNextStep}
-              canProceed={stepCompleted}
-              isPlaneLocked={isPlaneLocked}
-              onReAnchor={() => setIsPlaneLocked(false)}
-              isVoiceActive={isVoiceActive}
-              onToggleVoice={() => setIsVoiceActive(!isVoiceActive)}
-              safetyPoints={safetyPoints}
-              moduleTitle={activeModule.title[language] || activeModule.title.en}
-              feedback={hudFeedback}
-            />
-          </div>
+          <ModuleGatedFlow
+            module={activeModule}
+            worker={currentWorker}
+            language={language}
+            onExit={() => {
+              setActiveModule(null);
+              window.location.hash = '';
+            }}
+            onCertificateIssued={(cert) => {
+              setCertificates(offlineStorage.getCertificates());
+            }}
+            onVerifyInAdmin={(certId) => {
+              setActiveModule(null);
+              setActiveTab('admin');
+              setQrInitialCertId(certId);
+              setQrScannerOpen(true);
+            }}
+          />
         ) : activeTab === 'training' ? (
           /* WORKER TRAINING MODULES CATALOG VIEW (Geometric Balance Theme) */
           <div className="max-w-7xl mx-auto w-full p-4 sm:p-6 md:p-8 flex flex-col gap-6">
@@ -644,13 +602,22 @@ export default function App() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                 {safetyModules.map(module => {
-                  const isCompleted = workerCertificates.some(c => c.moduleKey === module.id);
-                  const certRecord = workerCertificates.find(c => c.moduleKey === module.id);
+                  const progress = offlineStorage.getModuleProgress(currentWorker.id, module.id, module.steps.length);
+                  const isPassed = progress.passed && (progress.bestScore >= PASS_THRESHOLD);
+                  const completedSteps = progress.completedStepIndices.length;
+                  const totalSteps = module.steps.length;
+                  const percentSteps = Math.round((completedSteps / totalSteps) * 100);
 
                   return (
                     <div
                       key={module.id}
-                      className="bg-white border border-slate-200 rounded p-5 sm:p-6 shadow-sm hover:shadow-md hover:border-slate-300 flex flex-col justify-between gap-4 sm:gap-5 transition-all group"
+                      className={`bg-white border-2 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4 group ${
+                        isPassed 
+                          ? 'border-emerald-300' 
+                          : progress.trainingCompleted 
+                          ? 'border-amber-300' 
+                          : 'border-slate-200'
+                      }`}
                     >
                       <div className="space-y-3">
                         {/* Top Badge & Duration */}
@@ -659,7 +626,7 @@ export default function App() {
                             {module.badge}
                           </span>
                           <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
-                            ⏱️ {module.durationMinutes} {t.minsDuration} • {t.passingScoreLabel} {module.requiredPassingScore}%
+                            ⏱️ {module.durationMinutes} {t.minsDuration} • Pass: {PASS_THRESHOLD}%
                           </span>
                         </div>
 
@@ -684,56 +651,146 @@ export default function App() {
                           </p>
                         </div>
 
-                        {/* Objectives List */}
-                        <div className="space-y-1.5 pt-2">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                            {t.interactiveSequence}
-                          </span>
-                          <ul className="space-y-1.5">
-                            {module.steps.map((step) => (
-                              <li key={step.id} className="text-xs text-slate-700 flex items-start gap-2">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0 mt-0.5" />
-                                <span>{step.title[language]}</span>
-                              </li>
-                            ))}
-                          </ul>
+                        {/* 4-Stage Gated Flow Tracker in Card */}
+                        <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 space-y-2">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-bold text-slate-700 text-[11px] uppercase tracking-wider">
+                              {language === 'hi' ? 'प्रशिक्षण प्रगति' : 'Training Progress'}
+                            </span>
+                            <span className="font-semibold text-slate-600 text-[11px]">
+                              {completedSteps}/{totalSteps} {language === 'hi' ? 'चरण' : 'sections'} ({percentSteps}%)
+                            </span>
+                          </div>
+
+                          <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full rounded-full transition-all duration-300 ${
+                                progress.trainingCompleted ? 'bg-emerald-500' : 'bg-orange-500'
+                              }`}
+                              style={{ width: `${percentSteps}%` }}
+                            />
+                          </div>
+
+                          {/* Gated Status Pills */}
+                          <div className="flex items-center gap-2 pt-1 flex-wrap text-[10px] font-bold">
+                            <span className={`px-2 py-0.5 rounded flex items-center gap-1 ${
+                              progress.trainingCompleted 
+                                ? 'bg-emerald-100 text-emerald-800' 
+                                : 'bg-slate-200 text-slate-700'
+                            }`}>
+                              {progress.trainingCompleted ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <BookOpen className="w-3 h-3" />}
+                              <span>{language === 'hi' ? 'प्रशिक्षण' : 'Training'}: {progress.trainingCompleted ? 'Done' : `${percentSteps}%`}</span>
+                            </span>
+
+                            <span className={`px-2 py-0.5 rounded flex items-center gap-1 ${
+                              isPassed
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : progress.trainingCompleted
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-slate-100 text-slate-400'
+                            }`}>
+                              {isPassed ? (
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              ) : progress.trainingCompleted ? (
+                                <FileQuestion className="w-3 h-3 text-amber-600" />
+                              ) : (
+                                <Lock className="w-3 h-3 text-slate-400" />
+                              )}
+                              <span>
+                                {language === 'hi' ? 'परीक्षा' : 'Test'}: {
+                                  isPassed 
+                                    ? `Passed (${progress.bestScore}%)` 
+                                    : progress.trainingCompleted 
+                                    ? 'Unlocked' 
+                                    : 'Locked'
+                                }
+                              </span>
+                            </span>
+
+                            {isPassed && (
+                              <span className="px-2 py-0.5 rounded bg-orange-100 text-orange-800 flex items-center gap-1">
+                                <Award className="w-3 h-3 text-orange-600" />
+                                <span>{language === 'hi' ? 'प्रमाणित' : 'Certified'}</span>
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
-                      {/* Bottom Action Footer */}
-                      <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3 flex-wrap">
-                        {isCompleted && certRecord ? (
-                          <div className="flex items-center gap-1.5 text-xs text-green-700 font-bold bg-green-50 border border-green-200 px-3 py-1 rounded">
-                            <ShieldCheck className="w-4 h-4 text-green-600" />
-                            <span>{t.certifiedBadge} ({certRecord.score}%)</span>
+                      {/* Bottom Action Footer with Gated Navigation */}
+                      <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3 flex-wrap">
+                        {isPassed ? (
+                          <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-lg">
+                            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                            <span>{t.certifiedBadge} ({progress.bestScore}%)</span>
+                          </div>
+                        ) : progress.trainingCompleted ? (
+                          <div className="text-xs text-amber-700 font-bold bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                            <FileQuestion className="w-3.5 h-3.5 text-amber-600" />
+                            <span>{language === 'hi' ? 'परीक्षा अनलॉक है' : 'Test Ready to Take'}</span>
                           </div>
                         ) : (
                           <div className="text-xs text-slate-500 font-medium">
-                            {t.statusOfflineReady}
+                            {completedSteps > 0 
+                              ? (language === 'hi' ? `${completedSteps}/${totalSteps} चरण पूर्ण` : `${completedSteps}/${totalSteps} steps completed`)
+                              : t.statusOfflineReady}
                           </div>
                         )}
 
                         <div className="flex items-center gap-2">
-                          {isCompleted && certRecord && (
+                          {isPassed ? (
+                            <>
+                              <button
+                                id={`btn-view-cert-${module.id}`}
+                                onClick={() => handleStartModule(module, 'certificate')}
+                                className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-tight rounded-xl shadow-sm transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
+                              >
+                                <Award className="w-3.5 h-3.5" />
+                                <span>{t.viewCertificate}</span>
+                              </button>
+
+                              <button
+                                id={`btn-retake-cert-${module.id}`}
+                                onClick={() => handleStartModule(module, 'training')}
+                                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition-all cursor-pointer"
+                                title="Review training or practice"
+                              >
+                                <span>{language === 'hi' ? 'पुनरावलोकन' : 'Practice'}</span>
+                              </button>
+                            </>
+                          ) : progress.trainingCompleted ? (
+                            <>
+                              <button
+                                id={`btn-review-${module.id}`}
+                                onClick={() => handleStartModule(module, 'training')}
+                                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl border border-slate-200 transition-all cursor-pointer"
+                              >
+                                <span>{language === 'hi' ? 'प्रशिक्षण' : 'Training'}</span>
+                              </button>
+
+                              <button
+                                id={`btn-test-${module.id}`}
+                                onClick={() => handleStartModule(module, 'test')}
+                                className="flex items-center gap-1.5 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-tight rounded-xl shadow-sm transition-all active:scale-95 cursor-pointer"
+                              >
+                                <FileQuestion className="w-3.5 h-3.5 text-white" />
+                                <span>{language === 'hi' ? 'परीक्षा दें' : 'Take Safety Test'}</span>
+                              </button>
+                            </>
+                          ) : (
                             <button
-                              onClick={() => {
-                                haptics.trigger('tap');
-                                setSelectedCertForModal(certRecord);
-                              }}
-                              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded border border-slate-200 transition-all"
+                              id={`btn-launch-${module.id}`}
+                              onClick={() => handleStartModule(module, 'training')}
+                              className="flex items-center gap-1.5 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-tight rounded-xl shadow-sm transition-all active:scale-95 cursor-pointer"
                             >
-                              {t.viewCertificate}
+                              <Play className="w-3.5 h-3.5 fill-white text-white" />
+                              <span>
+                                {completedSteps > 0 
+                                  ? (language === 'hi' ? `जारी रखें (${completedSteps}/${totalSteps})` : `Resume (${completedSteps}/${totalSteps})`)
+                                  : t.startModule}
+                              </span>
                             </button>
                           )}
-
-                          <button
-                            id={`btn-launch-${module.id}`}
-                            onClick={() => handleStartModule(module)}
-                            className="flex items-center gap-1.5 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs uppercase tracking-tight rounded shadow-sm transition-all active:scale-95"
-                          >
-                            <Play className="w-3.5 h-3.5 fill-white text-white" />
-                            <span>{t.startModule}</span>
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -953,7 +1010,11 @@ export default function App() {
       {qrScannerOpen && (
         <QRScannerModal
           language={language}
-          onClose={() => setQrScannerOpen(false)}
+          initialCertId={qrInitialCertId}
+          onClose={() => {
+            setQrScannerOpen(false);
+            setQrInitialCertId('');
+          }}
         />
       )}
 

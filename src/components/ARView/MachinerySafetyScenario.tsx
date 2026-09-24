@@ -161,7 +161,7 @@ export const MachinerySafetyScenario: React.FC<MachinerySafetyScenarioProps> = (
       )}
 
       {/* 3D AR Ground Plane Heavy Conveyor & Rotating Gear Machinery (Elevated for full visibility) */}
-      <div className="absolute bottom-[180px] sm:bottom-[200px] left-1/2 -translate-x-1/2 pointer-events-none z-10 flex flex-col items-center">
+      <div className="absolute bottom-[64px] sm:bottom-[72px] left-1/2 -translate-x-1/2 pointer-events-none z-10 flex flex-col items-center">
         <GameMachineryCanvas
           beltSpeed={beltSpeed}
           eStopPulled={eStopPulled}
@@ -181,7 +181,7 @@ export const MachinerySafetyScenario: React.FC<MachinerySafetyScenarioProps> = (
 
       {/* STEP 1: Identify Rotating Nip Points / Pinch Zones - Pinned to bottom, clear & clickable */}
       {stepIndex === 1 && (
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-red-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-3 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-red-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-3 pointer-events-auto">
           <div className="flex items-center justify-between w-full">
             <span className="text-xs font-black uppercase tracking-wider text-red-400 flex items-center gap-1.5">
               <AlertOctagon className="w-4 h-4 text-red-500" />
@@ -211,7 +211,7 @@ export const MachinerySafetyScenario: React.FC<MachinerySafetyScenarioProps> = (
 
       {/* STEP 2: Emergency Pull-Cord Tripwire Activation */}
       {stepIndex === 2 && (
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-red-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col gap-3 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-red-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col gap-3 pointer-events-auto">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-wider text-red-400 flex items-center gap-1.5">
               <AlertOctagon className="w-4 h-4 text-red-500" />
@@ -250,7 +250,7 @@ export const MachinerySafetyScenario: React.FC<MachinerySafetyScenarioProps> = (
 
       {/* STEP 3: Apply LOTO Isolation & Padlock on 415V Isolator */}
       {stepIndex === 3 && (
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-amber-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col gap-3 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-amber-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col gap-3 pointer-events-auto">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
               <Lock className="w-4 h-4 text-amber-500" />
@@ -289,7 +289,7 @@ export const MachinerySafetyScenario: React.FC<MachinerySafetyScenarioProps> = (
 
       {/* STEP 4: Test Zero Energy State Verification */}
       {stepIndex === 4 && (
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-emerald-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-3 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-emerald-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-3 pointer-events-auto">
           <div className="flex items-center justify-between w-full">
             <span className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />

@@ -6,6 +6,7 @@ import { translations } from '../../data/translations';
 import { audioAssistant } from '../../utils/audioAssistant';
 import { offlineStorage } from '../../utils/offlineStorage';
 import { AIVoiceCoachWidget } from '../AICoach/AIVoiceCoachWidget';
+import { PASS_THRESHOLD } from '../../utils/constants';
 
 interface AssessmentModalProps {
   module: SafetyModule;
@@ -215,19 +216,19 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-white border border-slate-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden my-auto flex flex-col">
+    <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+      <div className="bg-white border border-slate-200/90 w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden my-auto flex flex-col">
         {/* Modal Header */}
-        <div className="bg-slate-900 text-white p-4 sm:p-5 flex items-center justify-between border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400 font-bold">
-              <Award className="w-5 h-5" />
+        <div className="bg-slate-900 text-white p-5 sm:p-6 flex items-center justify-between border-b border-slate-800">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400 font-bold shadow-sm">
+              <Award className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest block">
+              <span className="text-[11px] font-bold text-orange-400 uppercase tracking-widest block">
                 {module.badge}
               </span>
-              <h2 className="text-sm sm:text-base font-bold text-white leading-tight">
+              <h2 className="text-base sm:text-lg font-bold text-white leading-tight">
                 {module.title[language]} - {t.takeAssessment}
               </h2>
             </div>
@@ -238,42 +239,42 @@ export const AssessmentModal: React.FC<AssessmentModalProps> = ({
               audioAssistant.stopSpeaking();
               onClose();
             }}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <XCircle className="w-5 h-5" />
           </button>
         </div>
 
         {/* Proctored Candidate Identification Verification Banner */}
-        <div className="bg-emerald-950/90 text-emerald-100 border-b border-emerald-800/80 px-4 py-2 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2.5">
+        <div className="bg-slate-100 border-b border-slate-200 px-5 py-3 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-3">
             {worker.idPhotoUrl ? (
               <img 
                 src={worker.idPhotoUrl} 
                 alt={worker.name} 
-                className="w-7 h-7 rounded border border-emerald-400 object-cover"
+                className="w-8 h-8 rounded-lg border border-slate-300 object-cover"
               />
             ) : (
-              <div className="w-7 h-7 rounded bg-emerald-900 border border-emerald-500 flex items-center justify-center font-bold text-emerald-300 text-[10px]">
-                ID
+              <div className="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center font-bold text-white text-xs">
+                {worker.name[0]}
               </div>
             )}
             <div>
-              <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">
-                ✓ DGMS Proctored Genuine Examinee
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
+                Proctored Examinee
               </span>
-              <span className="font-semibold text-white">
-                {worker.name} <span className="font-mono text-emerald-300 font-normal">({worker.id})</span>
+              <span className="font-bold text-slate-800">
+                {worker.name} <span className="font-mono text-slate-500 font-normal">({worker.id})</span>
               </span>
             </div>
           </div>
-          <span className="text-[10px] bg-emerald-800/80 border border-emerald-600 text-emerald-200 px-2 py-0.5 rounded font-mono">
-            BIOMETRIC-LOCKED
+          <span className="text-[11px] font-mono font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-lg">
+            PASS: {PASS_THRESHOLD}%
           </span>
         </div>
 
         {/* Modal Body */}
-        <div className="p-4 sm:p-6 flex-1 overflow-y-auto max-h-[72vh] bg-slate-50/60 space-y-4">
+        <div className="p-6 sm:p-8 flex-1 overflow-y-auto max-h-[75vh] bg-slate-50/50 space-y-6">
           {!submitted ? (
             /* ACTIVE QUESTION VIEW */
             <div className="flex flex-col gap-4">

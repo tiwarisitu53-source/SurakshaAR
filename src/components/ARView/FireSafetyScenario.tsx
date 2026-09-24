@@ -295,22 +295,22 @@ export const FireSafetyScenario: React.FC<FireSafetyScenarioProps> = ({
 
       {/* 3D AR Ground Plane Fire - Anchored Directly on the Floor When Phone Points Down */}
       <div 
-        className="absolute bottom-[180px] sm:bottom-[200px] left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-700 z-10 flex flex-col items-center"
+        className="absolute bottom-[64px] sm:bottom-[72px] left-1/2 -translate-x-1/2 pointer-events-none transition-all duration-700 z-10 flex flex-col items-center"
         style={{
           opacity: fireExtinguished ? 0.35 : 1,
-          transform: `translateX(-50%) scale(${0.85 + flameHeightScale * 0.25})`
+          transform: `translateX(-50%) scale(${0.95 + flameHeightScale * 0.25})`
         }}
       >
         {/* Game Dynamic Ground Fire Canvas */}
-        <div className="relative w-[360px] h-[360px] pointer-events-none">
+        <div className="relative w-[380px] h-[380px] sm:w-[420px] sm:h-[420px] pointer-events-none">
           <GameFireCanvas
             flameHeightScale={flameHeightScale}
             isExtinguished={fireExtinguished}
             isDischarging={passState.squeezed && (isSprayingContinuous || passState.sweeping)}
             sprayType={selectedExtinguisher === 'water' ? 'water' : 'dcp'}
             sweepProgress={passState.sweepProgress}
-            width={360}
-            height={360}
+            width={400}
+            height={400}
           />
         </div>
 

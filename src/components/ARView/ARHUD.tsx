@@ -91,25 +91,25 @@ export const ARHUD: React.FC<ARHUDProps> = ({
   };
 
   return (
-    <div id="ar-hud-overlay" className="absolute inset-0 pointer-events-none flex flex-col justify-between p-3 sm:p-4 z-40 select-none">
+    <div id="ar-hud-overlay" className="absolute inset-0 pointer-events-none flex flex-col justify-between p-2 sm:p-3 z-40 select-none overflow-hidden">
       {/* Top Section: Navigation Bar & Compact Floating Instruction Banner */}
-      <div className="flex flex-col gap-2 w-full max-w-2xl mx-auto pointer-events-auto">
+      <div className="flex flex-col gap-1.5 w-full max-w-2xl mx-auto pointer-events-auto shrink-0">
         {/* Top Control Bar */}
-        <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center justify-between gap-1.5 flex-wrap">
           {/* Left: Step indicator, Module badge and Exit */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               id="btn-exit-ar"
               onClick={handleExit}
-              className="flex items-center gap-1.5 px-3 py-2 bg-slate-900/90 backdrop-blur-md border border-slate-700 hover:border-red-500/80 rounded-xl text-slate-200 hover:text-white text-xs sm:text-sm font-bold uppercase tracking-tight transition-all shadow-lg active:scale-95 cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700 hover:border-red-500/80 rounded-xl text-slate-200 hover:text-white text-xs sm:text-sm font-bold uppercase tracking-tight transition-all shadow-lg active:scale-95 cursor-pointer"
               title={t.exitTraining}
             >
-              <X className="w-4 h-4 text-red-400" />
+              <X className="w-3.5 h-3.5 text-red-400" />
               <span className="hidden xs:inline">{t.exitTraining}</span>
             </button>
 
-            <div className="flex items-center gap-1.5 px-3 py-2 bg-slate-900/90 backdrop-blur-md border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-200 font-bold shadow-lg">
-              <span className="w-2.5 h-2.5 rounded-full bg-orange-400 animate-pulse"></span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700 rounded-xl text-xs sm:text-sm text-slate-200 font-bold shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse"></span>
               <span>
                 {language === 'hi'
                   ? `चरण ${currentStepIndex + 1} / ${totalSteps}`
@@ -120,17 +120,17 @@ export const ARHUD: React.FC<ARHUDProps> = ({
             </div>
 
             {moduleTitle && (
-              <div className="hidden sm:flex items-center px-2.5 py-1.5 bg-orange-500/20 border border-orange-500/40 rounded-xl text-xs font-bold text-orange-300">
+              <div className="hidden sm:flex items-center px-2 py-1 bg-orange-500/20 border border-orange-500/40 rounded-xl text-[11px] font-bold text-orange-300">
                 {moduleTitle}
               </div>
             )}
           </div>
 
           {/* Right: Safety Points, Voice Assistant & AR Surface Status */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {/* Real-time Safety Points Badge */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/20 border border-amber-500/50 rounded-xl text-amber-300 text-xs sm:text-sm font-black shadow-lg">
-              <Award className="w-4 h-4 text-amber-400 shrink-0" />
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/20 border border-amber-500/50 rounded-xl text-amber-300 text-xs sm:text-sm font-black shadow-lg">
+              <Award className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span>{safetyPoints}</span>
               <span className="text-[10px] text-amber-400/80 uppercase font-semibold">PTS</span>
             </div>
@@ -139,10 +139,10 @@ export const ARHUD: React.FC<ARHUDProps> = ({
             <button
               id="btn-speak-instruction"
               onClick={handleSpeakCurrentStep}
-              className="flex items-center gap-1.5 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-lg active:scale-95 cursor-pointer uppercase tracking-tight"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-lg active:scale-95 cursor-pointer uppercase tracking-tight"
               title={t.voiceAssistant}
             >
-              <Volume2 className="w-4 h-4 text-white" />
+              <Volume2 className="w-3.5 h-3.5 text-white" />
               <span className="hidden md:inline">{t.voiceAssistant}</span>
             </button>
 
@@ -150,21 +150,21 @@ export const ARHUD: React.FC<ARHUDProps> = ({
             <button
               id="btn-toggle-voice"
               onClick={() => { haptics.trigger('tap'); onToggleVoice(); }}
-              className={`p-2 rounded-xl backdrop-blur-md border transition-all cursor-pointer ${
+              className={`p-1.5 rounded-xl backdrop-blur-md border transition-all cursor-pointer ${
                 isVoiceActive 
                   ? 'bg-slate-900/90 border-slate-700 text-slate-300 hover:bg-slate-800' 
                   : 'bg-red-500/90 border-red-400 text-white'
               }`}
               title={isVoiceActive ? t.audioGuideActive : t.audioGuideMute}
             >
-              {isVoiceActive ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              {isVoiceActive ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
             </button>
 
             {/* Haptic Tactile Feedback Toggle */}
             <button
               id="btn-toggle-haptics"
               onClick={handleToggleHaptics}
-              className={`p-2 rounded-xl backdrop-blur-md border transition-all cursor-pointer ${
+              className={`p-1.5 rounded-xl backdrop-blur-md border transition-all cursor-pointer ${
                 hapticsEnabled 
                   ? 'bg-amber-500/20 border-amber-500/60 text-amber-300 hover:bg-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.3)]' 
                   : 'bg-slate-900/90 border-slate-700 text-slate-500 hover:bg-slate-800'
@@ -175,28 +175,28 @@ export const ARHUD: React.FC<ARHUDProps> = ({
                   : (language === 'hi' ? 'हैप्टिक कंपन बंद' : language === 'sat' ? 'ᱦᱮᱯᱴᱤᱠ ᱵᱚᱸᱫᱽ' : 'Tactile Haptics Disabled')
               }
             >
-              {hapticsEnabled ? <Vibrate className="w-4 h-4 text-amber-400 animate-pulse" /> : <VibrateOff className="w-4 h-4 text-slate-400" />}
+              {hapticsEnabled ? <Vibrate className="w-3.5 h-3.5 text-amber-400 animate-pulse" /> : <VibrateOff className="w-3.5 h-3.5 text-slate-400" />}
             </button>
 
             {/* AR Surface status badge */}
             <div 
               onClick={() => { haptics.trigger('tap'); onReAnchor && onReAnchor(); }}
-              className={`hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl backdrop-blur-md border text-xs font-medium cursor-pointer ${
+              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl backdrop-blur-md border text-xs font-medium cursor-pointer ${
                 isPlaneLocked 
                   ? 'bg-green-950/80 border-green-700 text-green-300' 
                   : 'bg-orange-950/80 border-orange-700 text-orange-300 animate-pulse'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3 h-3" />
               <span>{isPlaneLocked ? t.planeDetected : t.scanningSurface}</span>
             </div>
           </div>
         </div>
 
-        {/* Top Objective Bar - Ultra-compact (34px high), triggers bottom drawer toggle */}
+        {/* Top Objective Bar - Ultra-compact, triggers bottom drawer toggle */}
         <div 
           onClick={handleToggleDrawer}
-          className="flex items-center justify-between px-3 py-1.5 bg-slate-950/85 backdrop-blur-md border border-amber-500/40 rounded-xl shadow-lg transition-all cursor-pointer hover:bg-slate-900/90 group"
+          className="flex items-center justify-between px-3 py-1 bg-slate-950/85 backdrop-blur-md border border-amber-500/40 rounded-xl shadow-lg transition-all cursor-pointer hover:bg-slate-900/90 group"
           title={isDrawerOpen ? 'Close bottom instruction drawer' : 'Slide open bottom instruction drawer'}
         >
           {/* Step objective title */}
@@ -210,29 +210,29 @@ export const ARHUD: React.FC<ARHUDProps> = ({
           {/* Guide Drawer Trigger Button */}
           <div
             id="btn-toggle-instruction-guide"
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all shrink-0 shadow-sm ${
+            className={`flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-bold transition-all shrink-0 shadow-sm ${
               isDrawerOpen
                 ? 'bg-amber-500 text-slate-950 font-black'
                 : 'bg-slate-900 text-amber-300 border border-amber-500/40 group-hover:border-amber-400'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5 shrink-0" />
+            <BookOpen className="w-3 h-3 shrink-0" />
             <span>{isDrawerOpen ? (language === 'hi' ? 'ड्रॉअर बंद करें' : 'Hide Drawer') : (language === 'hi' ? 'निर्देश गाइड ▲' : 'Guide Drawer ▲')}</span>
-            {isDrawerOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
+            {isDrawerOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
           </div>
         </div>
       </div>
 
-      {/* Slide-In Bottom Drawer for Mission Instructions (Strictly docks in lower 30vh, leaves central AR viewport completely unobstructed) */}
+      {/* Slide-In Bottom Drawer for Mission Instructions (Pinned seamlessly at bottom of AR container) */}
       <div
         id="ar-bottom-instruction-drawer"
-        className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none flex flex-col items-center justify-end"
+        className="absolute bottom-0 left-0 right-0 z-40 pointer-events-none flex flex-col items-center justify-end"
       >
         {/* Backdrop overlay (dismiss on click outside without occluding top center) */}
         {isDrawerOpen && (
           <div
             onClick={() => setIsDrawerOpen(false)}
-            className="fixed inset-0 z-30 bg-slate-950/40 backdrop-blur-[2px] pointer-events-auto transition-opacity duration-300"
+            className="absolute inset-0 z-30 bg-slate-950/40 backdrop-blur-[2px] pointer-events-auto transition-opacity duration-300"
           />
         )}
 
@@ -401,14 +401,14 @@ export const ARHUD: React.FC<ARHUDProps> = ({
 
       {/* Bottom Floating Proceed/Next Step Button (ONLY when step completed and drawer is closed) */}
       {canProceed && onNextStep && !isDrawerOpen && (
-        <div className="fixed bottom-14 right-3 sm:bottom-16 sm:right-6 z-50 pointer-events-auto">
+        <div className="absolute bottom-13 right-3 sm:bottom-14 sm:right-6 z-50 pointer-events-auto">
           <button
             id="btn-proceed-next-step"
             onClick={handleProceed}
-            className="flex items-center gap-2 px-5 py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider rounded-2xl shadow-[0_0_30px_rgba(249,115,22,0.7)] animate-bounce active:scale-95 cursor-pointer transition-all border-2 border-white/50"
+            className="flex items-center gap-2 px-4 py-2.5 sm:px-5 sm:py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider rounded-2xl shadow-[0_0_30px_rgba(249,115,22,0.7)] animate-bounce active:scale-95 cursor-pointer transition-all border-2 border-white/50"
           >
             <span>{currentStepIndex + 1 === totalSteps ? t.completeModule : t.nextStep}</span>
-            <ArrowRight className="w-5 h-5 text-slate-950" />
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-950" />
           </button>
         </div>
       )}

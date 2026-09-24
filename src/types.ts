@@ -175,3 +175,33 @@ export interface AdminKPIs {
     english: number;
   };
 }
+
+export type ModuleFlowStage = 'training' | 'test' | 'results' | 'certificate';
+
+export interface MistakeReviewItem {
+  questionId: string;
+  questionNumber: number;
+  prompt: LocalizedString;
+  questionType: 'mcq' | 'sequence' | 'ar_spatial';
+  userAnswerText: string;
+  correctAnswerText: string;
+  isCorrect: boolean;
+  explanation?: LocalizedString;
+}
+
+export interface ModuleProgressRecord {
+  workerId: string;
+  moduleId: ModuleKey;
+  trainingCompleted: boolean;
+  completedStepIndices: number[];
+  totalStepsCount: number;
+  testAttempts: number;
+  bestScore: number;
+  lastScore?: number;
+  passed: boolean;
+  certificateIssued: boolean;
+  certificateId?: string;
+  certificateDate?: string;
+  lastMistakes?: MistakeReviewItem[];
+  updatedAt: string;
+}

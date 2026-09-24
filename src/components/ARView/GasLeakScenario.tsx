@@ -407,7 +407,7 @@ export const GasLeakScenario: React.FC<GasLeakScenarioProps> = ({
 
       {/* AR STEP 1: Multi-Gas Atmospheric Meter HUD (Stratified Reading & Logging) */}
       {stepIndex === 1 && (
-        <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-yellow-500 rounded-3xl p-3 sm:p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col gap-2 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-yellow-500 rounded-3xl p-3 sm:p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col gap-2 pointer-events-auto">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black text-yellow-400 uppercase tracking-wider flex items-center gap-1.5">
               <Activity className="w-4 h-4 text-yellow-400" />
@@ -506,7 +506,7 @@ export const GasLeakScenario: React.FC<GasLeakScenarioProps> = ({
 
       {/* AR STEP 2: PPE Equipment Station (Interactive) */}
       {stepIndex === 2 && (
-        <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] flex justify-center gap-3 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] flex justify-center gap-3 pointer-events-auto">
           {/* Cloth Dust Mask (Inadequate) */}
           <div
             onClick={() => handleSelectPPE('cloth_mask')}
@@ -543,7 +543,7 @@ export const GasLeakScenario: React.FC<GasLeakScenarioProps> = ({
 
       {/* AR STEP 3: Standby Buddy & Lifeline Verification */}
       {stepIndex === 3 && (
-        <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-sky-400 rounded-3xl p-3.5 sm:p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-2.5 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-sky-400 rounded-3xl p-3.5 sm:p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-2.5 pointer-events-auto">
           <div className="flex items-center justify-between w-full">
             <span className="text-xs font-black uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
               <UserCheck className="w-4 h-4 text-sky-400" />
@@ -573,7 +573,7 @@ export const GasLeakScenario: React.FC<GasLeakScenarioProps> = ({
 
       {/* AR STEP 4: LOTO Isolation & Axial Forced Air Blower Purging */}
       {stepIndex === 4 && (
-        <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-emerald-400 rounded-3xl p-3.5 sm:p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-2.5 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-emerald-400 rounded-3xl p-3.5 sm:p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-2.5 pointer-events-auto">
           <div className="flex items-center justify-between w-full">
             <span className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
               <Fan className="w-4 h-4 text-emerald-400 animate-spin" />

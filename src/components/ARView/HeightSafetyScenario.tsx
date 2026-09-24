@@ -165,7 +165,7 @@ export const HeightSafetyScenario: React.FC<HeightSafetyScenarioProps> = ({
       )}
 
       {/* 3D AR Ground & Scaffold Platform Graphics Engine (Elevated so it never overlaps buttons) */}
-      <div className="absolute bottom-[180px] sm:bottom-[200px] left-1/2 -translate-x-1/2 pointer-events-none z-10 flex flex-col items-center">
+      <div className="absolute bottom-[64px] sm:bottom-[72px] left-1/2 -translate-x-1/2 pointer-events-none z-10 flex flex-col items-center">
         <GameHeightCanvas
           hooksConnected={lanyardHooksConnected}
           anchorTested={anchorLoadTested}
@@ -185,7 +185,7 @@ export const HeightSafetyScenario: React.FC<HeightSafetyScenarioProps> = ({
 
       {/* STEP 1: Scaffold Green Tag Verification - Pinned to bottom, crystal clear & clickable */}
       {stepIndex === 1 && (
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-emerald-400 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-3 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-emerald-400 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-3 pointer-events-auto">
           <div className="flex items-center justify-between w-full">
             <span className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
@@ -215,7 +215,7 @@ export const HeightSafetyScenario: React.FC<HeightSafetyScenarioProps> = ({
 
       {/* STEP 2: Double-Lanyard 100% Tie-Off Connection */}
       {stepIndex === 2 && (
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-amber-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col gap-3 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-amber-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col gap-3 pointer-events-auto">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
               <Link className="w-4 h-4 text-amber-500" />
@@ -249,7 +249,7 @@ export const HeightSafetyScenario: React.FC<HeightSafetyScenarioProps> = ({
 
       {/* STEP 3: Anchor Point Tension Load Test */}
       {stepIndex === 3 && (
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-sky-400 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col gap-3 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-sky-400 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col gap-3 pointer-events-auto">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
               <Anchor className="w-4 h-4 text-sky-400" />
@@ -288,7 +288,7 @@ export const HeightSafetyScenario: React.FC<HeightSafetyScenarioProps> = ({
 
       {/* STEP 4: Suspension Trauma Relief Strap */}
       {stepIndex === 4 && (
-        <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-emerald-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-3 pointer-events-auto">
+        <div className="absolute bottom-13 sm:bottom-14 left-1/2 -translate-x-1/2 z-40 max-w-lg w-[calc(100%-1.5rem)] bg-slate-950/95 backdrop-blur-xl border-2 border-emerald-500 rounded-3xl p-4 shadow-[0_0_40px_rgba(0,0,0,0.8)] flex flex-col items-center gap-3 pointer-events-auto">
           <div className="flex items-center justify-between w-full">
             <span className="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
               <Award className="w-4 h-4 text-emerald-500" />

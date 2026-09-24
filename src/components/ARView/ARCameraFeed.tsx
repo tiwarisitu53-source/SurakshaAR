@@ -26,69 +26,116 @@ export const ARCameraFeed: React.FC<ARCameraFeedProps> = ({
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [gridScanProgress, setGridScanProgress] = useState<number>(0);
   const [simulationMode, setSimulationMode] = useState<boolean>(false);
-  const [cameraInitializing, setCameraInitializing] = useState<boolean>(true);
+  const [cameraInitializing, setCameraInitializing] = useState<boolean>(false);
+  const [userPromptNeeded, setUserPromptNeeded] = useState<boolean>(false);
 
   const t = translations[language];
 
-  // Progressive camera initialization function
-  const initCamera = useCallback(async () => {
-    if (simulationMode) {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-        streamRef.current = null;
-      }
+  // Stop any active camera streams safely
+  const stopStream = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => {
+        try {
+          track.stop();
+        } catch (e) {}
+      });
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  };
+
+  // Progressive camera initialization function with multi-tier fallback
+  const initCamera = useCallback(async (forceEnable: boolean = false) => {
+    if (simulationMode && !forceEnable) {
+      stopStream();
       setCameraActive(false);
       setCameraInitializing(false);
       return;
     }
 
-    setCameraInitializing(true);
-    setCameraError(null);
-
-    // Stop any existing stream
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
+    if (forceEnable) {
+      setSimulationMode(false);
     }
 
+    setCameraInitializing(true);
+    setCameraError(null);
+    stopStream();
+
     if (!navigator?.mediaDevices?.getUserMedia) {
-      setCameraError('Camera API not supported in this browser context.');
+      setCameraError(
+        language === 'hi'
+          ? 'इस ब्राउज़र में कैमरा API समर्थित नहीं है। 3D वर्चुअल वर्कशॉप सक्रिय है।'
+          : 'Camera API is not supported in this browser context. 3D Virtual Workshop is active.'
+      );
       setCameraActive(false);
       setCameraInitializing(false);
+      setSimulationMode(true);
       return;
     }
 
     let stream: MediaStream | null = null;
 
-    // 1st attempt: Ideal environment constraints
+    // 1st attempt: Facing mode constraint (without overconstrained dimensions)
     try {
       stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: { ideal: facingMode },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
+          facingMode: { ideal: facingMode }
         },
         audio: false
       });
     } catch (err1) {
-      console.warn('Ideal camera constraints failed, attempting generic video request...', err1);
-      // 2nd attempt: Basic unconstrained video request
+      // 2nd attempt: Basic unconstrained video
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: false
         });
       } catch (err2: any) {
-        console.warn('Camera access denied or unavailable:', err2);
-        const errMsg = err2?.name === 'NotAllowedError' || err2?.name === 'PermissionDeniedError'
-          ? 'Camera permission denied. Click to allow or use 3D Mine Simulator.'
-          : err2?.name === 'NotFoundError' || err2?.name === 'DevicesNotFoundError'
-          ? 'No camera hardware found. 3D Mine Simulator enabled.'
-          : 'Unable to access camera. 3D Mine Simulator active.';
-        setCameraError(errMsg);
-        setCameraActive(false);
-        setCameraInitializing(false);
-        return;
+        // 3rd attempt: Enumerate devices and select first video device
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const videoDev = devices.find(d => d.kind === 'videoinput');
+          if (videoDev?.deviceId) {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: { deviceId: { ideal: videoDev.deviceId } },
+              audio: false
+            });
+          } else {
+            throw err2;
+          }
+        } catch (err3: any) {
+          console.warn('Camera stream acquisition failed:', err3);
+          const isDenied = err3?.name === 'NotAllowedError' || err3?.name === 'PermissionDeniedError';
+          const isNotFound = err3?.name === 'NotFoundError' || err3?.name === 'DevicesNotFoundError';
+
+          if (isDenied) {
+            setCameraError(
+              language === 'hi'
+                ? 'कैमरा अनुमति अस्वीकृत या अवरुद्ध है। कैमरा चालू करने के लिए "कैमरा अनुमति दें" पर क्लिक करें।'
+                : 'Camera permission denied or blocked in browser. Click "Enable Camera" to grant access.'
+            );
+            setUserPromptNeeded(true);
+          } else if (isNotFound) {
+            setCameraError(
+              language === 'hi'
+                ? 'सिस्टम पर कोई वेबकैम नहीं मिला। 3D वर्चुअल वर्कशॉप सक्रिय है।'
+                : 'No camera hardware detected. 3D Virtual Workshop is active.'
+            );
+            setSimulationMode(true);
+          } else {
+            setCameraError(
+              language === 'hi'
+                ? 'कैमरा वर्तमान में उपलब्ध नहीं है। 3D सिमुलेटर में प्रशिक्षण जारी रखें।'
+                : 'Camera stream unavailable. Continue training in the 3D Virtual Workshop.'
+            );
+            setUserPromptNeeded(true);
+          }
+          setCameraActive(false);
+          setCameraInitializing(false);
+          return;
+        }
       }
     }
 
@@ -96,30 +143,31 @@ export const ARCameraFeed: React.FC<ARCameraFeedProps> = ({
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.muted = true;
+        videoRef.current.playsInline = true;
+        videoRef.current.setAttribute('playsinline', 'true');
+        videoRef.current.setAttribute('muted', 'true');
+        videoRef.current.setAttribute('autoplay', 'true');
         try {
-          const playPromise = videoRef.current.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(e => console.log('Video auto-play handled:', e));
-          }
+          await videoRef.current.play();
         } catch (e) {
-          console.log('Video play error handled:', e);
+          console.warn('Video auto-play handled:', e);
         }
       }
       setCameraActive(true);
       setCameraError(null);
       setCameraInitializing(false);
+      setUserPromptNeeded(false);
+      setSimulationMode(false);
     }
-  }, [facingMode, simulationMode]);
+  }, [facingMode, simulationMode, language]);
 
-  // Trigger camera on mount and when facingMode or simulationMode changes
+  // Initial attempt on mount
   useEffect(() => {
-    initCamera();
+    initCamera(false);
 
     return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-        streamRef.current = null;
-      }
+      stopStream();
     };
   }, [initCamera]);
 
@@ -138,7 +186,7 @@ export const ARCameraFeed: React.FC<ARCameraFeedProps> = ({
         }
         return prev + 25;
       });
-    }, 500);
+    }, 450);
 
     return () => clearInterval(interval);
   }, [isPlaneLocked]);
@@ -155,11 +203,18 @@ export const ARCameraFeed: React.FC<ARCameraFeedProps> = ({
   };
 
   const toggleSimulation = () => {
-    setSimulationMode(prev => !prev);
+    if (cameraActive && !simulationMode) {
+      stopStream();
+      setSimulationMode(true);
+      setCameraActive(false);
+    } else {
+      setSimulationMode(false);
+      initCamera(true);
+    }
   };
 
   return (
-    <div className="relative w-full h-full min-h-[520px] bg-slate-950 overflow-hidden select-none">
+    <div className="relative flex-1 min-h-0 w-full h-full bg-slate-950 overflow-hidden select-none">
       {/* 1. Real Video Stream Background - ALWAYS MOUNTED in DOM to prevent React ref detachment */}
       <video
         ref={videoRef}
@@ -179,7 +234,7 @@ export const ARCameraFeed: React.FC<ARCameraFeedProps> = ({
         <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-slate-900 via-slate-950 to-neutral-950 z-0 overflow-hidden">
           {/* Industrial Wall & Girders SVG Scene */}
           <div className="absolute inset-0 opacity-40">
-            <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-full h-full" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
               <defs>
                 <pattern id="industrial-wall-pattern" width="60" height="40" patternUnits="userSpaceOnUse">
                   <path d="M 0 20 L 60 20 M 30 0 L 30 20 M 0 40 L 60 40 M 60 20 L 60 40" fill="none" stroke="#334155" strokeWidth="1" />
@@ -218,6 +273,38 @@ export const ARCameraFeed: React.FC<ARCameraFeedProps> = ({
               transformOrigin: 'bottom'
             }}
           />
+
+          {/* Camera Permission / Action Prompt Banner in 3D Viewport when not active */}
+          {!cameraActive && !simulationMode && (
+            <div className="absolute top-28 left-1/2 -translate-x-1/2 z-30 w-11/12 max-w-sm bg-slate-900/95 border border-orange-500/50 rounded-2xl p-4 text-center backdrop-blur-md shadow-2xl space-y-2.5">
+              <div className="flex items-center justify-center gap-2 text-orange-400 font-bold text-xs uppercase tracking-wider">
+                <Camera className="w-4 h-4 animate-bounce" />
+                <span>{language === 'hi' ? 'लाइव एआर कैमरा चालू करें' : language === 'sat' ? 'ᱠᱮᱢᱮᱨᱟ ᱪᱟᱹᱞᱩᱭ ᱢᱮ' : 'Enable Live Camera Feed'}</span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {language === 'hi' 
+                  ? 'कैमरा चालू करने के लिए अनुमति दें, या 3D वर्चुअल वर्कशॉप में सीधे प्रशिक्षण लें।' 
+                  : 'Grant browser camera access for live video AR pass-through, or continue with the 3D Virtual Workshop.'}
+              </p>
+              <div className="flex items-center justify-center gap-2 flex-wrap pt-1">
+                <button
+                  id="btn-permit-camera"
+                  onClick={() => initCamera(true)}
+                  className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Video className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'कैमरा अनुमति दें' : 'Enable Camera'}</span>
+                </button>
+                <button
+                  id="btn-switch-3d-sim"
+                  onClick={() => setSimulationMode(true)}
+                  className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl border border-slate-700 transition-all cursor-pointer"
+                >
+                  <span>{language === 'hi' ? '3D सिमुलेटर' : 'Use 3D Workshop'}</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -258,10 +345,10 @@ export const ARCameraFeed: React.FC<ARCameraFeedProps> = ({
       </div>
 
       {/* Camera Status & Controls Top Right */}
-      <div className="absolute top-16 right-3 sm:right-4 z-40 flex flex-col items-end gap-2">
+      <div className="absolute top-20 right-3 sm:right-4 z-40 flex flex-col items-end gap-2">
         <div className="flex items-center gap-2">
           {/* Status Indicator */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-900/90 border border-slate-700/80 rounded text-[11px] font-semibold text-slate-200 backdrop-blur-md shadow-sm">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-900/90 border border-slate-700/80 rounded-lg text-[11px] font-semibold text-slate-200 backdrop-blur-md shadow-sm">
             <span className={`w-2 h-2 rounded-full ${cameraActive && !simulationMode ? 'bg-green-400 animate-pulse' : 'bg-amber-400'}`} />
             <span>
               {cameraActive && !simulationMode 
@@ -273,7 +360,7 @@ export const ARCameraFeed: React.FC<ARCameraFeedProps> = ({
           <button
             id="btn-toggle-ar-camera"
             onClick={toggleSimulation}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 backdrop-blur-md border border-slate-700/80 rounded text-slate-200 text-xs font-bold shadow-lg transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 backdrop-blur-md border border-slate-700/80 rounded-lg text-slate-200 text-xs font-bold shadow-lg transition-all active:scale-95 cursor-pointer"
             title={language === 'sat' ? 'ᱠᱮᱢᱮᱨᱟ ᱟᱨ 3D ᱢᱩᱫᱽ ᱨᱮ ᱵᱚᱫᱚᱞ' : language === 'hi' ? 'कैमरा और 3D सिमुलेटर बदलें' : 'Toggle between Live Camera and 3D Mine Simulator'}
           >
             <Layers className="w-3.5 h-3.5 text-sky-400" />
@@ -288,7 +375,7 @@ export const ARCameraFeed: React.FC<ARCameraFeedProps> = ({
             <button
               id="btn-flip-ar-camera"
               onClick={toggleCameraFacing}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-900/90 hover:bg-slate-800 backdrop-blur-md border border-slate-700/80 rounded text-slate-200 text-xs font-semibold shadow-lg transition-all active:scale-95"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-900/90 hover:bg-slate-800 backdrop-blur-md border border-slate-700/80 rounded-lg text-slate-200 text-xs font-semibold shadow-lg transition-all active:scale-95 cursor-pointer"
               title={language === 'sat' ? 'ᱠᱮᱢᱮᱨᱟ ᱟᱹᱪᱩᱨ ᱢᱮ' : language === 'hi' ? 'कैमरा पलटें' : 'Flip camera'}
             >
               <RefreshCw className="w-3.5 h-3.5 text-emerald-400" />
@@ -298,21 +385,21 @@ export const ARCameraFeed: React.FC<ARCameraFeedProps> = ({
 
         {/* Camera Permission / Error Notice if camera is unavailable */}
         {cameraError && !simulationMode && (
-          <div className="bg-amber-950/90 border border-amber-500/70 text-amber-200 px-3 py-1.5 rounded text-[11px] flex items-center gap-2 shadow-lg max-w-xs animate-fade-in">
+          <div className="bg-slate-900/95 border border-amber-500/70 text-slate-200 px-3 py-2 rounded-xl text-[11px] flex items-center gap-2.5 shadow-xl max-w-xs animate-fade-in backdrop-blur-md">
             <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-            <span className="leading-tight">{cameraError}</span>
+            <span className="leading-tight flex-1">{cameraError}</span>
             <button
-              onClick={() => initCamera()}
-              className="underline font-bold text-white hover:text-amber-300 shrink-0 ml-1"
+              onClick={() => initCamera(true)}
+              className="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded text-[10px] shrink-0 transition-all cursor-pointer"
             >
-              {language === 'sat' ? 'ᱫᱚᱦᱲᱟ ᱪᱮᱥᱴᱟ' : language === 'hi' ? 'पुनः प्रयास' : 'Retry'}
+              {language === 'sat' ? 'ᱪᱮᱥᱴᱟ' : language === 'hi' ? 'पुनः प्रयास' : 'Retry'}
             </button>
           </div>
         )}
       </div>
 
       {/* 3. Dynamic Scenario AR Interactive Objects (Children Layer) */}
-      <div className="absolute inset-0 z-20 overflow-hidden">
+      <div className="absolute inset-0 w-full h-full z-20 overflow-hidden">
         {children}
       </div>
     </div>

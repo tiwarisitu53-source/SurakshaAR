@@ -1,9 +1,10 @@
-import { CertificateRecord, OfflineSyncItem } from '../types';
+import { CertificateRecord, OfflineSyncItem, ModuleKey, ModuleProgressRecord, MistakeReviewItem } from '../types';
 import { initialCertificatesDatabase } from '../data/mockCertificates';
 
 const CERT_STORAGE_KEY = 'suraksha_ar_certificates';
 const PENDING_SYNC_KEY = 'suraksha_ar_pending_sync';
 const OFFLINE_OVERRIDE_KEY = 'suraksha_offline_override';
+const MODULE_PROGRESS_KEY = 'suraksha_ar_module_progress';
 
 export class OfflineStorageManager {
   private static instance: OfflineStorageManager;
@@ -119,6 +120,22 @@ export class OfflineStorageManager {
     const newCerts = [updatedCert, ...filtered];
     localStorage.setItem(CERT_STORAGE_KEY, JSON.stringify(newCerts));
 
+    // Also sync module progress record so the gated state immediately reflects the certificate
+    if (cert.workerId && cert.moduleKey) {
+      const progress = this.getModuleProgress(cert.workerId, cert.moduleKey);
+      this.saveModuleProgress({
+        ...progress,
+        trainingCompleted: true,
+        passed: true,
+        bestScore: Math.max(progress.bestScore || 0, cert.score),
+        lastScore: cert.score,
+        certificateIssued: true,
+        certificateId: cert.certificateId,
+        certificateDate: cert.date,
+        updatedAt: new Date().toISOString()
+      });
+    }
+
     if (isOffline) {
       // Queue for offline sync
       const syncItem: OfflineSyncItem = {
@@ -212,6 +229,142 @@ export class OfflineStorageManager {
     const certs = this.getCertificates().filter(c => c.certificateId !== certId);
     localStorage.setItem(CERT_STORAGE_KEY, JSON.stringify(certs));
     this.notify();
+  }
+
+  // --- Module Gated Progress & State Tracking ---
+
+  private getProgressMap(): Record<string, ModuleProgressRecord> {
+    if (typeof window === 'undefined') return {};
+    try {
+      const raw = localStorage.getItem(MODULE_PROGRESS_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  private saveProgressMap(map: Record<string, ModuleProgressRecord>) {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(MODULE_PROGRESS_KEY, JSON.stringify(map));
+      this.notify();
+    } catch (e) {
+      console.error('Failed to save module progress', e);
+    }
+  }
+
+  public getModuleProgress(workerId: string, moduleId: ModuleKey, defaultTotalSteps: number = 5): ModuleProgressRecord {
+    const key = `${workerId}_${moduleId}`;
+    const map = this.getProgressMap();
+    if (map[key]) {
+      return map[key];
+    }
+
+    // Check if worker already has an existing certificate for this module
+    const existingCert = this.getCertificates().find(
+      c => c.workerId === workerId && c.moduleKey === moduleId
+    );
+
+    if (existingCert) {
+      const fullSteps = Array.from({ length: defaultTotalSteps }, (_, i) => i);
+      const seedRecord: ModuleProgressRecord = {
+        workerId,
+        moduleId,
+        trainingCompleted: true,
+        completedStepIndices: fullSteps,
+        totalStepsCount: defaultTotalSteps,
+        testAttempts: 1,
+        bestScore: existingCert.score,
+        lastScore: existingCert.score,
+        passed: true,
+        certificateIssued: true,
+        certificateId: existingCert.certificateId,
+        certificateDate: existingCert.date,
+        updatedAt: new Date().toISOString()
+      };
+      map[key] = seedRecord;
+      this.saveProgressMap(map);
+      return seedRecord;
+    }
+
+    // Default clean state
+    const cleanRecord: ModuleProgressRecord = {
+      workerId,
+      moduleId,
+      trainingCompleted: false,
+      completedStepIndices: [],
+      totalStepsCount: defaultTotalSteps,
+      testAttempts: 0,
+      bestScore: 0,
+      passed: false,
+      certificateIssued: false,
+      updatedAt: new Date().toISOString()
+    };
+    return cleanRecord;
+  }
+
+  public saveModuleProgress(record: ModuleProgressRecord) {
+    const key = `${record.workerId}_${record.moduleId}`;
+    const map = this.getProgressMap();
+    map[key] = {
+      ...record,
+      updatedAt: new Date().toISOString()
+    };
+    this.saveProgressMap(map);
+  }
+
+  public markStepCompleted(
+    workerId: string, 
+    moduleId: ModuleKey, 
+    stepIndex: number, 
+    totalSteps: number
+  ): ModuleProgressRecord {
+    const progress = this.getModuleProgress(workerId, moduleId, totalSteps);
+    const stepSet = new Set(progress.completedStepIndices);
+    stepSet.add(stepIndex);
+    const updatedIndices = Array.from(stepSet).sort((a, b) => a - b);
+    const allCompleted = updatedIndices.length >= totalSteps;
+
+    const updated: ModuleProgressRecord = {
+      ...progress,
+      completedStepIndices: updatedIndices,
+      totalStepsCount: totalSteps,
+      trainingCompleted: progress.trainingCompleted || allCompleted,
+      updatedAt: new Date().toISOString()
+    };
+    this.saveModuleProgress(updated);
+    return updated;
+  }
+
+  public recordTestResult(
+    workerId: string,
+    moduleId: ModuleKey,
+    score: number,
+    passed: boolean,
+    mistakes: MistakeReviewItem[],
+    certId?: string,
+    certDate?: string
+  ): ModuleProgressRecord {
+    const progress = this.getModuleProgress(workerId, moduleId);
+    const updated: ModuleProgressRecord = {
+      ...progress,
+      testAttempts: (progress.testAttempts || 0) + 1,
+      lastScore: score,
+      bestScore: Math.max(progress.bestScore || 0, score),
+      passed: progress.passed || passed,
+      certificateIssued: progress.certificateIssued || (passed && !!certId),
+      certificateId: certId || progress.certificateId,
+      certificateDate: certDate || progress.certificateDate,
+      lastMistakes: mistakes,
+      updatedAt: new Date().toISOString()
+    };
+    this.saveModuleProgress(updated);
+    return updated;
+  }
+
+  public resetModuleTestAttempt(workerId: string, moduleId: ModuleKey): ModuleProgressRecord {
+    const progress = this.getModuleProgress(workerId, moduleId);
+    return progress;
   }
 }
 
