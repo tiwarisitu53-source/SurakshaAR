@@ -14,14 +14,15 @@ Demo Video
 Watch here: https://youtu.be/IUEoxlAxAU0
 
 ---
-Hackathon	Smart India Hackathon 2026
-Problem Statement ID	SIH26041
-Problem Statement Title	AR-Based Vocational Training & Safety Certification Platform (Jharkhand Mining/Steel/Mica)
-Theme	Smart Education
-PS Category	Software
-Team ID	169665
-Team Name	I Can't Stop Winning
-
+| Detail | Information |
+|---|---|
+| Hackathon | Smart India Hackathon 2026 |
+| Problem Statement ID | SIH26041 |
+| Problem Statement Title | AR-Based Vocational Training & Safety Certification Platform (Jharkhand Mining/Steel/Mica) |
+| Theme | Smart Education |
+| PS Category | Software |
+| Team ID | 169665 |
+| Team Name | I Can't Stop Winning |
 ---
 
 ## 🎯 Problem
