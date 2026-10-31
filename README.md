@@ -9,6 +9,11 @@ SurakshaAR is an interactive **Augmented Reality (AR) safety training platform**
 The platform focuses on transforming traditional safety training into **interactive, scenario-based learning**, allowing workers to understand hazards, follow correct emergency procedures, and improve safety awareness without being exposed to real-world risks during training.
 
 ---
+Demo Video
+
+Watch here: https://youtu.be/IUEoxlAxAU0
+
+---
 
 ## 🎯 Problem
 
