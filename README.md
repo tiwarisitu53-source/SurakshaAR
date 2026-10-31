@@ -25,20 +25,17 @@ Watch here: https://youtu.be/IUEoxlAxAU0
 | Team Name | I Can't Stop Winning |
 ---
 
-## Problem
+## The Problem
 
-Mining environments involve high-risk situations such as:
+Workers in Jharkhand's mining, steel and mica industries are not getting safety training that works.
 
-* Fire and explosion hazards
-* Gas leaks and toxic environments
-* Machinery-related accidents
-* Incorrect or missing PPE
-* Improper emergency response
-* Unsafe working practices
+| Today's method | Why it fails |
+|---|---|
+| VR training | Too expensive for contractors and small units |
+| Classroom sessions | Workers forget; nothing hands-on |
+| Paper certificates | Easy to fake; prove nothing about understanding |
 
-Traditional safety training often relies heavily on classroom lectures, videos, and theoretical instructions.
-
-Workers may understand the procedure theoretically but still struggle to **identify hazards and react correctly during an actual emergency**.
+Jharkhand had the **highest number of fatal coal-mine accidents in India in 2022-23**, with **48 mining workers killed** (DGMS).
 
 ### Our Goal
 
@@ -46,65 +43,57 @@ SurakshaAR aims to bridge this gap through **immersive, interactive and scenario
 
 ---
 
-## Solution
+## Our Solution
 
-SurakshaAR provides a digital training environment where workers can:
+**SURAKSHA-AR turns any Rs 8,000+ Android phone into a safety classroom.**
 
-1. Enter an interactive safety scenario.
-2. Identify potential hazards.
-3. Learn the correct safety procedure.
-4. Interact with safety elements.
-5. Practice emergency responses.
-6. Complete assessments.
-7. Receive feedback on their performance.
+A worker trains in AR on their real surroundings, takes a scored test, and receives a QR certificate that anyone can verify and no one can forge.
 
-This allows workers to **practice before facing real-world situations**.
+## How It Works
 
----
+```
+Register  >  Pick language  >  Pick module  >  AR training  >  Test (80% to pass)
+                                                                      |
+         Admin verifies  <  QR + blockchain hash  <  Certificate  <---+
+```
+
+1. **Register** with worker ID and photo
+2. **Choose** English, Hindi or Santali
+3. **Train in AR**: hazard zones, PPE and evacuation routes appear over the real environment
+4. **Take the test**: pass at 80%, retry if you fail
+5. **Get certified**: certificate with QR code, hash stored on blockchain
+6. **Verify**: employers and DGMS scan the QR to confirm it is genuine
+
+## Why It Stands Out
+
+| | VR Training | **SURAKSHA-AR** |
+|---|---|---|
+| Hardware | Costly headset | **Any Rs 8K+ Android phone** |
+| Internet | Often required | **Fully offline, syncs later** |
+| Language | Mostly English | **English, Hindi, Santali (with audio)** |
+| Certificate | Paper or PDF | **QR + blockchain, tamper-proof** |
+| Cost per worker | High | **Near zero** |
 
 ## Key Features
 
-### Augmented Reality Training
+- **AR Training Modules**: Fire and Explosion, Gas Leak and Confined Space
+- **Offline-First**: modules, tests and results work with zero connectivity and auto-sync when online
+- **Assessment Engine**: scored quizzes, 80% pass mark, retry on fail
+- **Blockchain-Secured Certificates**: hash anchored on-chain, so records stay valid even if the database is compromised
+- **Tribal Workforce Ready**: full UI in Santali, audio support and an AI voice assistant
+- **Admin Dashboard**: worker-wise compliance, certification status and pass/fail analytics
 
-Interactive AR-based scenarios help trainees visualize hazards and safety equipment in their environment.
+## Tech Stack
 
-### Fire Safety Training
-
-A simulated fire emergency allows trainees to learn the correct sequence of actions, including identifying the hazard and following appropriate emergency procedures.
-
-### Mining Hazard Awareness
-
-Training scenarios can demonstrate hazards relevant to mining environments, such as gas leaks and confined spaces.
-
-### PPE Awareness
-
-Workers can learn about the importance of appropriate personal protective equipment before entering hazardous environments.
-
-### Interactive Assessment
-
-Trainees can test their understanding through scenario-based questions and actions instead of relying only on theoretical learning.
-
-### Multilingual Learning
-
-The platform is designed with accessibility for local workers in mind, with support for regional-language learning planned as the platform evolves.
-
-### Mobile-Friendly
-
-SurakshaAR is designed to make safety training accessible through commonly available mobile devices rather than requiring expensive specialized hardware.
-
----
-
-## Technology Stack
-
-| Technology           | Purpose                             |
-| -------------------- | ----------------------------------- |
-| **React**            | Frontend application                |
-| **TypeScript**       | Application logic and type safety   |
-| **Vite**             | Development and build tooling       |
-| **AR / Web APIs**    | Interactive AR experience           |
-| **HTML / CSS**       | User interface                      |
-| **JavaScript**       | Application interactions            |
-| **Google AI Studio** | AI-assisted application development |
+| Layer | Technology |
+|---|---|
+| AR Engine | Unity, AR Foundation, ARCore |
+| Offline Storage | Room DB / SQLite |
+| Backend | Node.js, Firebase |
+| Blockchain | Polygon / Hyperledger (certificate-hash ledger) |
+| QR | ZXing |
+| Admin Dashboard | React.js, Chart.js |
+| Security | Android Keystore, on-device signing |
 
 ---
 
@@ -246,38 +235,27 @@ The initial focus is on workers operating in **Jharkhand's mining and industrial
 
 ---
 
-## Expected Impact
+## Impact
 
-SurakshaAR aims to:
-
-* Improve safety awareness among workers.
-* Make safety training more interactive.
-* Allow repeated practice without physical risk.
-* Improve understanding of emergency procedures.
-* Reduce dependence on purely theoretical training.
-* Make digital safety training more accessible to workers.
+- **Safer workers**: hands-on training that people actually remember
+- **Near-zero cost**: no VR rigs; certificates travel with the worker across contractors
+- **Compliance ready**: tamper-proof, auditable record for Factories Act and Mines Act periodic certification (DGMS)
+- **Big market**: Jharkhand produced 206M tonnes of coal in FY 2024-25 (about 19.68% of India's output)
 
 ---
 
-## Future Scope
+## Risks and Mitigation
 
-The platform can be expanded with:
+| Risk | Our answer |
+|---|---|
+| AR accuracy on budget phones | Marker and plane-anchored AR for v1 |
+| Blockchain cost at scale | Store only hashes on a low-cost permissioned or testnet chain |
+| Certificate acceptance | Offline-first design with on-device signing; DGMS-auditable records |
 
-*  AI-powered personalized training
-*  Worker performance analytics
-*  Additional industrial safety scenarios
-*  More regional languages
-*  Dedicated Android application
-*  Offline training for low-connectivity mining areas
-*  Skill progression and certification
-*  Trainer and administrator dashboards
-*  Organization-level safety analytics
+## References
+
+[DGMS Accident Statistics](https://accident-statistics.dgms.gov.in/) | [Factly: Fatal and serious accidents in India's mines](https://factly.in/tracking-fatal-and-serious-accidents-in-indias-mines/) | [PIB: IIT (ISM) Dhanbad VRMS](https://www.pib.gov.in/PressReleasePage.aspx?PRID=2207948) | [CHRP-INDIA](https://www.chrp-india.com/) | [Tecknotrove](https://tecknotrove.com/)
 
 ---
 
-## Project Context
-
-SurakshaAR was developed as an **AR-based safety training solution for mining workers in Jharkhand**, with the goal of making industrial safety education more immersive, practical, and accessible.
-
----
-
+**SURAKSHA-AR: Safer workers. Verifiable skills. Zero VR cost.**
