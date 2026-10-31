@@ -14,6 +14,15 @@ Demo Video
 Watch here: https://youtu.be/IUEoxlAxAU0
 
 ---
+Hackathon	Smart India Hackathon 2026
+Problem Statement ID	SIH26041
+Problem Statement Title	AR-Based Vocational Training & Safety Certification Platform (Jharkhand Mining/Steel/Mica)
+Theme	Smart Education
+PS Category	Software
+Team ID	169665
+Team Name	I Can't Stop Winning
+
+---
 
 ## 🎯 Problem
 
@@ -270,30 +279,4 @@ The platform can be expanded with:
 SurakshaAR was developed as an **AR-based safety training solution for mining workers in Jharkhand**, with the goal of making industrial safety education more immersive, practical, and accessible.
 
 ---
-
-## 👥 Team
-
-**SurakshaAR Team**
-
-AVNI GUPTA  
-Team Lead
-
-BHOOMI CHOUDHARY  
-UI/UX, Presentation & Testing
-
-SATAKSHI TIWARI  
-Frontend
-
-SANKALP TIWARI  
-Pitch
-
-YOVIKA  
-Pitch
-
-TANISHKA DIXIT  
-Backend
-
----
-
-##
 
