@@ -25,16 +25,16 @@ Watch here: https://youtu.be/IUEoxlAxAU0
 | Team Name | I Can't Stop Winning |
 ---
 
-## 🎯 Problem
+## Problem
 
 Mining environments involve high-risk situations such as:
 
-* 🔥 Fire and explosion hazards
-* ☠️ Gas leaks and toxic environments
-* ⚙️ Machinery-related accidents
-* 🦺 Incorrect or missing PPE
-* 🚨 Improper emergency response
-* ⛏️ Unsafe working practices
+* Fire and explosion hazards
+* Gas leaks and toxic environments
+* Machinery-related accidents
+* Incorrect or missing PPE
+* Improper emergency response
+* Unsafe working practices
 
 Traditional safety training often relies heavily on classroom lectures, videos, and theoretical instructions.
 
@@ -46,7 +46,7 @@ SurakshaAR aims to bridge this gap through **immersive, interactive and scenario
 
 ---
 
-## 💡 Solution
+## Solution
 
 SurakshaAR provides a digital training environment where workers can:
 
@@ -62,39 +62,39 @@ This allows workers to **practice before facing real-world situations**.
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 🥽 Augmented Reality Training
+### Augmented Reality Training
 
 Interactive AR-based scenarios help trainees visualize hazards and safety equipment in their environment.
 
-### 🔥 Fire Safety Training
+### Fire Safety Training
 
 A simulated fire emergency allows trainees to learn the correct sequence of actions, including identifying the hazard and following appropriate emergency procedures.
 
-### ☠️ Mining Hazard Awareness
+### Mining Hazard Awareness
 
 Training scenarios can demonstrate hazards relevant to mining environments, such as gas leaks and confined spaces.
 
-### 🦺 PPE Awareness
+### PPE Awareness
 
 Workers can learn about the importance of appropriate personal protective equipment before entering hazardous environments.
 
-### 📝 Interactive Assessment
+### Interactive Assessment
 
 Trainees can test their understanding through scenario-based questions and actions instead of relying only on theoretical learning.
 
-### 🌐 Multilingual Learning
+### Multilingual Learning
 
 The platform is designed with accessibility for local workers in mind, with support for regional-language learning planned as the platform evolves.
 
-### 📱 Mobile-Friendly
+### Mobile-Friendly
 
 SurakshaAR is designed to make safety training accessible through commonly available mobile devices rather than requiring expensive specialized hardware.
 
 ---
 
-## 🏗️ Technology Stack
+## Technology Stack
 
 | Technology           | Purpose                             |
 | -------------------- | ----------------------------------- |
@@ -108,7 +108,7 @@ SurakshaAR is designed to make safety training accessible through commonly avail
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 SurakshaAR/
@@ -130,7 +130,7 @@ SurakshaAR/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -180,7 +180,7 @@ Open the local URL displayed in the terminal.
 
 ---
 
-## 🧪 Testing
+## Testing
 
 Before deployment, build the application to verify that the production bundle works correctly:
 
@@ -196,7 +196,7 @@ npm run preview
 
 ---
 
-## 🎮 Training Flow
+## Training Flow
 
 ```text
        ┌────────────────────┐
@@ -231,7 +231,7 @@ npm run preview
 
 ---
 
-## 🌍 Target Users
+## Target Users
 
 SurakshaAR is primarily designed for:
 
@@ -246,7 +246,7 @@ The initial focus is on workers operating in **Jharkhand's mining and industrial
 
 ---
 
-## 🎯 Expected Impact
+## Expected Impact
 
 SurakshaAR aims to:
 
@@ -259,23 +259,23 @@ SurakshaAR aims to:
 
 ---
 
-## 🔮 Future Scope
+## Future Scope
 
 The platform can be expanded with:
 
-* 🤖 AI-powered personalized training
-* 📊 Worker performance analytics
-* 🏭 Additional industrial safety scenarios
-* 🗣️ More regional languages
-* 📱 Dedicated Android application
-* 📴 Offline training for low-connectivity mining areas
-* 🏆 Skill progression and certification
-* 👨‍💼 Trainer and administrator dashboards
-* 📈 Organization-level safety analytics
+*  AI-powered personalized training
+*  Worker performance analytics
+*  Additional industrial safety scenarios
+*  More regional languages
+*  Dedicated Android application
+*  Offline training for low-connectivity mining areas
+*  Skill progression and certification
+*  Trainer and administrator dashboards
+*  Organization-level safety analytics
 
 ---
 
-## 🏆 Project Context
+## Project Context
 
 SurakshaAR was developed as an **AR-based safety training solution for mining workers in Jharkhand**, with the goal of making industrial safety education more immersive, practical, and accessible.
 
