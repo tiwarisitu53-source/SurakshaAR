@@ -11,6 +11,12 @@ The platform focuses on transforming traditional safety training into **interact
 ---
 Demo Video
 
+
+
+https://github.com/user-attachments/assets/364162d8-3403-4541-999a-723d82b0af04
+
+
+
 Watch here: https://youtu.be/IUEoxlAxAU0
 
 ---
@@ -23,6 +29,7 @@ Watch here: https://youtu.be/IUEoxlAxAU0
 | PS Category | Software |
 | Team ID | 169665 |
 | Team Name | I Can't Stop Winning |
+| Live Project | https://remix-surakshaar-industrial-safety-training-compl-8115.ai.studio |
 ---
 
 ## The Problem
